@@ -1,8 +1,9 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+const cTable = require('console.table');
 
 // create the connection information for the sql database
-var connection = mysql.createConnection({
+const connection = mysql.createConnection({
     host: "localhost",
 
     // Your port; if not 3306
@@ -37,7 +38,7 @@ function start() {
             if (answer.options === "View All Employees") {
                 viewEmployees();
             }
-            else if (answer.options === "View All Employees By DepartmentD") {
+            else if (answer.options === "View All Employees By Department") {
                 viewEmployeesByDept();
             }
             else if (answer.options === "View All Employees By Manager") {
@@ -78,86 +79,95 @@ function start() {
         });
 
 
-    // // function to handle viewing employees
-    // function viewEmployees() {
-    //     console.log("Viewing all employees...\n");
-    //     connection.query(
-    //         let query = "SELECT * FROM employee", [i];
-    //     connection.query(query, [i],  function (err, res) {
-    //         for (let i = 0; i < res.length; i++) {
-    //             console.table("ID: " + res[i].id + " || first_name: " + res[i].first_name + " || last_name: " + res[i].last_name + " || role_id: " +res[i].role_id);
-    //         }
-    //         // connection.end();
-    //         // re-prompt the user with options
-    //         start();
-    //     })
-    // };
+    // function to handle viewing employees
+    function viewEmployees() {
+        // console.log("Viewing all employees...\n");
 
-    // function viewEmployeesByDept() {
-    //     // query the database for all employees by department
-    //     connection.query("SELECT * FROM department", function (err, results) {
-    //         if (err) throw err;
-    //         // once you have the department names, prompt the user for which department to view
-    //         inquirer
-    //             .prompt([
-    //                 {
-    //                     name: "departmentChoice",
-    //                     type: "list",
-    //                     choices: function () {
-    //                         const departmentsArray = [];
-    //                         for (let i = 0; i < results.length; i++) {
-    //                             departmentsArray.push(results[i].name);
-    //                         }
-    //                         return departmentsArray;
-    //                     },
-    //                     message: "Which department would you like to see employees for?"
-    //                 },
-    //             ])
-    //             console.log(departmentChoice)
-    //             .then(function (answer) {
-    //                 // get the information of the chosen item
-    //                 let chosenItem;
-    //                 for (let i = 0; i < results.length; i++) {
-    //                     if (results[i].name === answer.departmentChoice) {
-    //                         chosenItem = results[i];
-    //                     }
-    //                 }
-    //             });
-    //     });
-    // }
+        let query = "SELECT * FROM employee";
+        connection.query(query, function (err, res) {
+            // console.log(res);
 
+            for (let i = 0; i < res.length; i++) {
+                console.table("ID: " + res[i].id + " || first_name: " + res[i].first_name + " || last_name: " + res[i].last_name + " || role_id: " + res[i].role_id + " || department_id: " + res[i].department_id + " || salary: " + res[i].salary + " || manager_id: " + res[i].manager_id);
+            }
+            connection.end();
+            // re-prompt the user with options
+            start();
+        })
+    };
+
+    function viewEmployeesByDept() {
+        console.log("Viewing all employees by department...\n");
+        // query the database for all employees by department
+        let query = "SELECT * FROM department";
+        connection.query(query, function (err, res) {
+            if (err) throw err;
+            // console.table(res)
+            // once you have the department names, prompt the user for which department to view
+            inquirer
+                .prompt([
+                    {
+                        name: "departmentChoice",
+                        type: "list",
+                        message: "Which department would you like to see employees for?",
+                        choices: res
+                        // function() {
+                        //     const departmentsArray = [];
+                        //     for (let i = 0; i < results.length; i++) {
+                        //         departmentsArray.push(results[i].name);
+                        //     }
+                        //     return departmentsArray[i];
+                        // },
+                    },
+                ])
+                .then(function (answer) {
+                    //     // get the information of the chosen item
+                    console.log(answer.departmentChoice)
+                    // if (answer.departmentChoice === answer) {
+                        // function salesEmployees(answer) {
+                            connection.query("SELECT * FROM department WHERE ?", {department: answer.departmentChoice}, function (err, res) {
+                                if (err) throw err;
+                                console.table(res);
+                            })
+                        // };
+                    // };
+                });
+        });
+    }
     // function viewEmployeesByMngr() {
-    //     // query the database for all employees by department
-    //     connection.query("SELECT * FROM manager????????????", function (err, results) {
+    //     console.log("Viewing all employees by manager...\n");
+    //     // query the database for all employees with managers
+    //     let query = "SELECT * FROM employee WHERE manager_id !=== null";
+    //     connection.query(query, function (err, res) {
     //         if (err) throw err;
-    //         // once you have the department names, prompt the user for which department to view
+    //         // console.table(res)
+    //         // once you have the manager names, prompt the user for which manager to view employees by
     //         inquirer
     //             .prompt([
     //                 {
     //                     name: "managerChoice",
     //                     type: "list",
-    //                     choices: function () {
-    //                         const managersArray = [];
-    //                         for (let i = 0; i < results.length; i++) {
-    //                             managersArray.push(results[i].name);
-    //                         }
-    //                         return managersArray;
-    //                     },
-    //                     message: "Which managers would you like to see employees for?"
+    //                     message: "Which manager would you like to see employees for?",
+    //                     choices: res
+                        
     //                 },
     //             ])
-    //             console.log(managerChoice)
     //             .then(function (answer) {
-    //                 // get the information of the chosen item
-    //                 let chosenItem;
-    //                 for (let i = 0; i < results.length; i++) {
-    //                     if (results[i].name === answer.managerChoice) {
-    //                         chosenItem = results[i];
-    //                     }
-    //                 }
+    //                 //     // get the information of the chosen item
+    //                 console.log(answer.managerChoice)
+    //                 // if (answer.departmentChoice === answer) {
+    //                     // function salesEmployees(answer) {
+    //                         connection.query("SELECT * FROM department WHERE ?", {manager: answer.managerChoice}, function (err, res) {
+    //                             if (err) throw err;
+    //                             console.table(res);
+    //                         })
+    //                     // };
+    //                 // };
     //             });
     //     });
     // }
+
+   
     // function addEmployee() {
     //     // query the database for all employees by department
     //     connection.query("SELECT * FROM manager????????????", function (err, results) {
