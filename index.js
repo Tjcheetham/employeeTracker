@@ -97,12 +97,12 @@ function start() {
     };
 
     function viewEmployeesByDept() {
-        console.log("Viewing all employees by department...\n");
+        // console.log("Viewing all employees by department...\n");
         // query the database for all employees by department
         let query = "SELECT * FROM department";
         connection.query(query, function (err, res) {
             if (err) throw err;
-            console.log(res);
+            // console.log(res);
 
             const departmentChoices = res.map(({id, name}) => ({
                 name: name,
@@ -127,15 +127,17 @@ function start() {
                 ])
                 .then(function (answer) {
                     //     // get the information of the chosen item
-                    console.log(answer.departmentChoice)
-                    let query = "SELECT * FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id = " + answer.departmentChoice;
-                    console.log(query);
+                    // console.log(answer.departmentChoice)
+                    let query = "SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id = " + answer.departmentChoice;
+                    // console.log(query);
                     // if (answer.departmentChoice === answer) {
                         // function salesEmployees(answer) {
                             connection.query(query, function (err, res) {
                                 
                                 if (err) throw err;
                                 console.table(res);
+                                connection.end();
+                                start();
                             })
                         // };
                     // };
