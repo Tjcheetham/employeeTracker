@@ -82,14 +82,14 @@ function start() {
     // function to handle viewing employees
     function viewEmployees() {
         // console.log("Viewing all employees...\n");
-
+        let query2 = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id";
         let query = "SELECT * FROM employee";
-        connection.query(query, function (err, res) {
+        connection.query(query2, function (err, res) {
             // console.log(res);
-
-            for (let i = 0; i < res.length; i++) {
-                console.table("ID: " + res[i].id + " || first_name: " + res[i].first_name + " || last_name: " + res[i].last_name + " || role_id: " + res[i].role_id + " || department_id: " + res[i].department_id + " || salary: " + res[i].salary + " || manager_id: " + res[i].manager_id);
-            }
+            console.table(res);
+            // for (let i = 0; i < res.length; i++) {
+            //     console.table("ID: " + res[i].id + " || first_name: " + res[i].first_name + " || last_name: " + res[i].last_name + " || role_id: " + res[i].role_id + " || department_id: " + res[i].department_id + " || salary: " + res[i].salary + " || manager_id: " + res[i].manager_id);
+            // }
             connection.end();
             // re-prompt the user with options
             start();
@@ -102,7 +102,12 @@ function start() {
         let query = "SELECT * FROM department";
         connection.query(query, function (err, res) {
             if (err) throw err;
-            // console.table(res)
+            console.log(res);
+
+            const departmentChoices = res.map(({id, name}) => ({
+                name: name,
+                value: id
+            }));
             // once you have the department names, prompt the user for which department to view
             inquirer
                 .prompt([
@@ -110,7 +115,7 @@ function start() {
                         name: "departmentChoice",
                         type: "list",
                         message: "Which department would you like to see employees for?",
-                        choices: res
+                        choices: departmentChoices
                         // function() {
                         //     const departmentsArray = [];
                         //     for (let i = 0; i < results.length; i++) {
@@ -123,9 +128,12 @@ function start() {
                 .then(function (answer) {
                     //     // get the information of the chosen item
                     console.log(answer.departmentChoice)
+                    let query = "SELECT * FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id = " + answer.departmentChoice;
+                    console.log(query);
                     // if (answer.departmentChoice === answer) {
                         // function salesEmployees(answer) {
-                            connection.query("SELECT * FROM department WHERE ?", {department: answer.departmentChoice}, function (err, res) {
+                            connection.query(query, function (err, res) {
+                                
                                 if (err) throw err;
                                 console.table(res);
                             })
