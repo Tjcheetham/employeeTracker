@@ -83,14 +83,15 @@ function start() {
     function viewEmployees() {
         // console.log("Viewing all employees...\n");
         let query2 = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id";
-        let query = "SELECT * FROM employee";
+        // console.log(employee.first_name);
+        // let query = "SELECT * FROM employee";
         connection.query(query2, function (err, res) {
             // console.log(res);
             console.table(res);
             // for (let i = 0; i < res.length; i++) {
             //     console.table("ID: " + res[i].id + " || first_name: " + res[i].first_name + " || last_name: " + res[i].last_name + " || role_id: " + res[i].role_id + " || department_id: " + res[i].department_id + " || salary: " + res[i].salary + " || manager_id: " + res[i].manager_id);
             // }
-            connection.end();
+            // connection.end();
             // re-prompt the user with options
             start();
         })
@@ -104,7 +105,7 @@ function start() {
             if (err) throw err;
             // console.log(res);
 
-            const departmentChoices = res.map(({id, name}) => ({
+            const departmentChoices = res.map(({ id, name }) => ({
                 name: name,
                 value: id
             }));
@@ -131,53 +132,63 @@ function start() {
                     let query = "SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id = " + answer.departmentChoice;
                     // console.log(query);
                     // if (answer.departmentChoice === answer) {
-                        // function salesEmployees(answer) {
-                            connection.query(query, function (err, res) {
-                                
-                                if (err) throw err;
-                                console.table(res);
-                                connection.end();
-                                start();
-                            })
-                        // };
+                    // function salesEmployees(answer) {
+                    connection.query(query, function (err, res) {
+
+                        if (err) throw err;
+                        console.table(res);
+                        // connection.end();
+                        start();
+                    })
+                    // };
                     // };
                 });
         });
     }
-    // function viewEmployeesByMngr() {
-    //     console.log("Viewing all employees by manager...\n");
-    //     // query the database for all employees with managers
-    //     let query = "SELECT * FROM employee WHERE manager_id !=== null";
-    //     connection.query(query, function (err, res) {
-    //         if (err) throw err;
-    //         // console.table(res)
-    //         // once you have the manager names, prompt the user for which manager to view employees by
-    //         inquirer
-    //             .prompt([
-    //                 {
-    //                     name: "managerChoice",
-    //                     type: "list",
-    //                     message: "Which manager would you like to see employees for?",
-    //                     choices: res
-                        
-    //                 },
-    //             ])
-    //             .then(function (answer) {
-    //                 //     // get the information of the chosen item
-    //                 console.log(answer.managerChoice)
-    //                 // if (answer.departmentChoice === answer) {
-    //                     // function salesEmployees(answer) {
-    //                         connection.query("SELECT * FROM department WHERE ?", {manager: answer.managerChoice}, function (err, res) {
-    //                             if (err) throw err;
-    //                             console.table(res);
-    //                         })
-    //                     // };
-    //                 // };
-    //             });
-    //     });
-    // }
+    function viewEmployeesByMngr() {
+        // console.log("Viewing all employees by manager...\n");
+        // query the database for all employees with managers
+        // console.log(employee.first_name);
+        let query = "SELECT employee.first_name, employee.last_name FROM employee WHERE manager_id IS NOT NULL";
+        connection.query(query, function (err, res) {
+            if (err) throw err;
+            console.table(res);
 
-   
+            const managerChoices = res.map(({ id, name }) => ({
+                name: name,
+                value: id
+            }));
+            // once you have the manager names, prompt the user for which manager to view employees by
+            inquirer
+                .prompt([
+                    {
+                        name: "managerChoice",
+                        type: "list",
+                        message: "Which manager would you like to see employees for?",
+                        choices: managerChoices
+
+                    },
+                ])
+                .then(function (answer) {
+                    //     //     // get the information of the chosen item
+                    //     console.log(answer.managerChoice)
+                    let query = "SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id WHERE department.id = " + answer.managerChoice;
+                    //     // if (answer.departmentChoice === answer) {
+                    //         // function salesEmployees(answer) {
+                    connection.query(query, function (err, res) {
+
+                        if (err) throw err;
+                        console.table(res);
+                        connection.end();
+                        start();
+                    })
+                    // };
+                    // };
+                });
+        });
+    }
+
+
     // function addEmployee() {
     //     // query the database for all employees by department
     //     connection.query("SELECT * FROM manager????????????", function (err, results) {
