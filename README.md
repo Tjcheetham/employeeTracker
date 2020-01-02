@@ -20,4 +20,4 @@ Express.js - Node.js - MySQL - JavaScript
 
 ### Link
 Check it out!
-https://tjcheetham.github.io/employeeTracker/.
+https://tjcheetham.github.io/employeeTracker/
