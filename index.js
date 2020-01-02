@@ -129,7 +129,7 @@ function start() {
                 .then(function (answer) {
                     //     // get the information of the chosen item
                     // console.log(answer.departmentChoice)
-                    let query = "SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id = " + answer.departmentChoice;
+                    let query = "SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id WHERE department.id = " + answer.departmentChoice;
                     // console.log(query);
                     // if (answer.departmentChoice === answer) {
                     // function salesEmployees(answer) {
@@ -149,29 +149,44 @@ function start() {
         // console.log("Viewing all employees by manager...\n");
         // query the database for all employees with managers
         // console.log(employee.first_name);
-        let query = "SELECT employee.first_name, employee.last_name FROM employee WHERE manager_id IS NOT NULL";
-        connection.query(query, function (err, res) {
+        let query = "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL";
+        connection.query(query, function (err, results) {
             if (err) throw err;
-            console.table(res);
+            console.table(results);
 
-            const managerChoices = res.map(({ id, name }) => ({
-                name: name,
-                value: id
-            }));
+            // const managerChoices = res.map(({ id, name }) => ({
+            //     first_name: name,
+            //     value: id
+            // }));
             // once you have the manager names, prompt the user for which manager to view employees by
             inquirer
                 .prompt([
                     {
                         name: "managerChoice",
                         type: "list",
+                        choices: function () {
+                            const managersArray = [];
+                            for (let i = 0; i < results.length; i++) {
+                                managersArray.push(results[i].first_name + " " + results[i].last_name);
+                            }
+                            return managersArray;
+                        },
                         message: "Which manager would you like to see employees for?",
-                        choices: managerChoices
-
                     },
                 ])
                 .then(function (answer) {
                     //     //     // get the information of the chosen item
-                    //     console.log(answer.managerChoice)
+                    console.log(answer.managerChoice)
+                    // Get ID Of Manager
+                    // let managerId;
+                    // for (var i = 0; i < results.length; i++) {
+                    //     if (results[i].first_name + " " + results[i].last_name === answer.managerChoice) {
+                    //         managerId = results[i].id;
+                    //     }
+                    // }
+
+                    console.log();
+
                     let query = "SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id WHERE department.id = " + answer.managerChoice;
                     //     // if (answer.departmentChoice === answer) {
                     //         // function salesEmployees(answer) {
@@ -181,7 +196,7 @@ function start() {
                         console.table(res);
                         connection.end();
                         start();
-                    })
+                    });
                     // };
                     // };
                 });
@@ -189,38 +204,26 @@ function start() {
     }
 
 
-    // function addEmployee() {
-    //     // query the database for all employees by department
-    //     connection.query("SELECT * FROM manager????????????", function (err, results) {
-    //         if (err) throw err;
-    //         // once you have the department names, prompt the user for which department to view
-    //         inquirer
-    //             .prompt([
-    //                 {
-    //                     name: "managerChoice",
-    //                     type: "list",
-    //                     choices: function () {
-    //                         const managersArray = [];
-    //                         for (let i = 0; i < results.length; i++) {
-    //                             managersArray.push(results[i].name);
-    //                         }
-    //                         return managersArray;
-    //                     },
-    //                     message: "Which managers would you like to see employees for?"
-    //                 },
-    //             ])
-    //             console.log(managerChoice)
-    //             .then(function (answer) {
-    //                 // get the information of the chosen item
-    //                 let chosenItem;
-    //                 for (let i = 0; i < results.length; i++) {
-    //                     if (results[i].name === answer.managerChoice) {
-    //                         chosenItem = results[i];
-    //                     }
-    //                 }
-    //             });
-    //     });
-    // }
+    function addEmployee() {
+        let query = "INSERT INTO employee (first_name, last_name, role_id, manager_id) WHERE ?, ?, ?, ?"
+        
+        connection.query(query, function (err, results) {
+            if (err) throw err;
+            console.table(results);
+            
+            inquirer
+                .prompt([
+                    {
+                        name: "employeeFN",
+                        type: "input",
+                        message: "Which department would you like to see employees for?",
+                        choices: newEmployee
+                        
+                    },
+                ])
+
+           });
+        }
     // function removeEmployee() {
     //     // query the database for all employees by department
     //     connection.query("SELECT * FROM manager????????????", function (err, results) {
